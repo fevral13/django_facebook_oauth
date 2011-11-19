@@ -1,10 +1,19 @@
-import cgi, urllib, json
+import urllib
+import urlparse
 
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
+from django.core.urlresolvers import reverse
 from django.db import IntegrityError
+try:
+    from simplejson import loads
+except ImportError:
+    # fallback to existing, though slow implementation
+    from django.utils.simplejson import loads
 
 from facebook.models import FacebookProfile
+
+
 
 class FacebookBackend:
     def authenticate(self, token=None, request=None):
@@ -12,23 +21,22 @@ class FacebookBackend:
         args = {
             'client_id': settings.FACEBOOK_APP_ID,
             'client_secret': settings.FACEBOOK_APP_SECRET,
-            'redirect_uri': request.build_absolute_uri('/facebook/authentication_callback'),
+            'redirect_uri': request.build_absolute_uri(reverse('facebook-authenticaton-callback')),
             'code': token,
         }
 
         # Get a legit access token
-        target = urllib.urlopen('https://graph.facebook.com/oauth/access_token?' + urllib.urlencode(args)).read()
-        response = cgi.parse_qs(target)
+        target = urllib.urlopen('https://graph.facebook.com/oauth/access_token?%s' % urllib.urlencode(args)).read()
+        response = urlparse.parse_qs(target)
         access_token = response['access_token'][-1]
 
         # Read the user's profile information
         fb_profile = urllib.urlopen('https://graph.facebook.com/me?access_token=%s' % access_token)
-        fb_profile = json.load(fb_profile)
+        fb_profile = loads(fb_profile)
 
         try:
             # Try and find existing user
             fb_user = FacebookProfile.objects.get(facebook_id=fb_profile['id'])
-            user = fb_user.user
 
             # Update access_token
             fb_user.access_token = access_token

@@ -6,15 +6,18 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
 from django.core.urlresolvers import reverse
 
+
+
 def login(request):
     """ First step of process, redirects user to facebook, which redirects to authentication_callback. """
 
     args = {
         'client_id': settings.FACEBOOK_APP_ID,
         'scope': settings.FACEBOOK_SCOPE,
-        'redirect_uri': request.build_absolute_uri('/facebook/authentication_callback'),
+        'redirect_uri': request.build_absolute_uri(reverse('facebook-authenticaton-callback')),
     }
-    return HttpResponseRedirect('https://www.facebook.com/dialog/oauth?' + urllib.urlencode(args))
+    return HttpResponseRedirect('https://www.facebook.com/dialog/oauth?%s' % urllib.urlencode(args))
+
 
 def authentication_callback(request):
     """ Second step of the login process.
