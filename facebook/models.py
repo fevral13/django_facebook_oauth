@@ -3,10 +3,10 @@ import urllib
 from django.db import models
 from django.contrib.auth.models import User
 try:
-    from simplejson import loads
+    from simplejson import load
 except ImportError:
     # fallback to existing, though slow implementation
-    from django.utils.simplejson import loads
+    from django.utils.simplejson import load
 
 
 
@@ -17,4 +17,4 @@ class FacebookProfile(models.Model):
 
     def get_facebook_profile(self):
         fb_profile = urllib.urlopen('https://graph.facebook.com/me?access_token=%s' % self.access_token)
-        return loads(fb_profile)
+        return load(fb_profile)

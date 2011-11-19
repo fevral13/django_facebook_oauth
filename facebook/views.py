@@ -28,7 +28,7 @@ def authentication_callback(request):
     if user.is_anonymous():
         #we have to set this user up
         url = reverse('facebook_setup')
-        url += "?code=%s" % code
+        url += '?code=%s' % code
 
         resp = HttpResponseRedirect(url)
 
@@ -36,7 +36,7 @@ def authentication_callback(request):
         auth_login(request, user)
 
         #figure out where to go after setup
-        url = getattr(settings, "LOGIN_REDIRECT_URL", "/")
+        url = getattr(settings, 'LOGIN_REDIRECT_URL', '/')
 
         resp = HttpResponseRedirect(url)
     

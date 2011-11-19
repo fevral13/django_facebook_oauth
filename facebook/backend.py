@@ -6,10 +6,10 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 try:
-    from simplejson import loads
+    from simplejson import load
 except ImportError:
     # fallback to existing, though slow implementation
-    from django.utils.simplejson import loads
+    from django.utils.simplejson import load
 
 from facebook.models import FacebookProfile
 
@@ -32,11 +32,12 @@ class FacebookBackend:
 
         # Read the user's profile information
         fb_profile = urllib.urlopen('https://graph.facebook.com/me?access_token=%s' % access_token)
-        fb_profile = loads(fb_profile)
+        fb_profile = load(fb_profile)
 
         try:
             # Try and find existing user
             fb_user = FacebookProfile.objects.get(facebook_id=fb_profile['id'])
+            user = fb_user.user
 
             # Update access_token
             fb_user.access_token = access_token
