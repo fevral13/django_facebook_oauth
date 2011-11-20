@@ -27,6 +27,7 @@ def authentication_callback(request):
 
     if user.is_anonymous():
         #we have to set this user up
+        # todo: this code is never reached
         url = reverse('facebook_setup')
         url += '?code=%s' % code
 
