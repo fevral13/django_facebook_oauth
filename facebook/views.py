@@ -2,10 +2,9 @@ import urllib
 
 from django.http import HttpResponseRedirect
 from django.conf import settings
-from django.contrib.auth import login as auth_login
-from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login, authenticate
 from django.core.urlresolvers import reverse
-
+from django.shortcuts import render
 
 
 def login(request):
@@ -25,20 +24,13 @@ def authentication_callback(request):
     code = request.GET.get('code')
     user = authenticate(token=code, request=request)
 
-    if user.is_anonymous():
-        #we have to set this user up
-        # todo: this code is never reached
-        url = reverse('facebook_setup')
-        url += '?code=%s' % code
-
-        resp = HttpResponseRedirect(url)
-
-    else:
+    if user:
         auth_login(request, user)
 
         #figure out where to go after setup
-        url = getattr(settings, 'LOGIN_REDIRECT_URL', '/')
-
+        url = settings.LOGIN_REDIRECT_URL or '/'
         resp = HttpResponseRedirect(url)
+    else:
+        resp = render(request, 'error.html')
     
     return resp
