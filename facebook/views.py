@@ -31,6 +31,6 @@ def authentication_callback(request):
         url = settings.LOGIN_REDIRECT_URL or '/'
         resp = HttpResponseRedirect(url)
     else:
-        resp = render(request, 'error.html')
+        resp = render(request, 'facebook/error.html')
     
     return resp

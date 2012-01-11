@@ -7,4 +7,4 @@ register = Library()
 
 @register.simple_tag(takes_context=True)
 def facebook_button(context):
-    return render_to_string('facebook-button.html', context)
+    return render_to_string('facebook/facebook-button.html', context)
