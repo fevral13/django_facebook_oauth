@@ -47,7 +47,7 @@ class FacebookBackend:
             # No existing user
 
             # Not all users have usernames
-            username = fb_profile.get('username', fb_profile['email'].split('@')[0])
+            username = fb_profile.get('username', fb_profile['email'])
 
             if getattr(settings, 'FACEBOOK_FORCE_SIGNUP', False):
                 # No existing user, use anonymous
@@ -127,18 +127,14 @@ class UseCurrentUserFacebookBackend(FacebookBackend):
             if request and request.user.is_authenticated():
                 user = request.user
                 try:
-                    profile = user.get_profile()
+                    profile = user.facebookprofile
                     # todo: check if this profile contains fb id
                     return user
                 except FacebookProfile.DoesNotExist:
                     pass
 
             else:
-                try:
-                    user = User.objects.create_user(fb_profile['id'], fb_profile['email'])
-                except IntegrityError:
-                    # Username already exists, make it unique
-                    user = User.objects.create_user('+'.join([fb_profile['id'], fb_profile['email']]), fb_profile['email'])
+                user = User.objects.create_user(fb_profile['email'], fb_profile['email'])
                 user.first_name = fb_profile['first_name']
                 user.last_name = fb_profile['last_name']
                 user.save()
